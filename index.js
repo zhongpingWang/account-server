@@ -99,7 +99,7 @@ app.get('/account/page/**', (req, res) => res.render('index', {
 }));
 
 //其他路由
-router(app);
+router(app,{redisClient});
 
 //静态资源
 app.use('/imgs', express.static(__dirname + '/static'));
