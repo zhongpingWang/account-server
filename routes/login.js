@@ -31,18 +31,18 @@ router.post('/login', function (req, res) {
 
         } else {
 
-            req.session.userInfo = doc;
+            //req.session.userInfo = doc;
 
             var secret = "token-secret";
             var expires =  60 * 60 * 24;
 
-            const token = jwt.sign(doc,secret,{ expiresIn: expires });
+            const token = jwt.sign({id:doc._id},secret,{ expiresIn: expires });
 
-            await redisClient.setAsync(token, JSON.stringify([]));
+            redisClient.setAsync(token, JSON.stringify([]));
 
             res.setHeader(
                 'Set-Cookie',
-                `.ak47=${token};domain=ibiographys.com;max-age=${expires};httpOnly`);
+                `token=${token};domain=abc.com;max-age=${expires};httpOnly`);
 
 
             UserInfo.resJSON(res, doc)
@@ -60,7 +60,7 @@ router.get('/loginout', function (req, res) {
 
     if (token) { 
         redisClient.del(token)
-        await redisClient.delAsync(token);
+        redisClient.delAsync(token);
     }
 
     // 删除session
@@ -74,27 +74,28 @@ router.get('/loginout', function (req, res) {
 
 
 
-router.get("/add", function (req, res) {
+router.post("/register", function (req, res) {
+
+    var params = req.body;
 
     UserInfo.save({
-        account: "admin",
-        userName: "admin",
-        passWord: "admin",
-        email: "admin",
-        phone: "admin",
-        mobile: "admin",
-        age: 19,
-        sex: 0,
-        desction: "admin",
-        depId: "admin",
-        avatar: "admin",
-        authId: "admin",
-        address: "admin",
-        posi: "admin"
+        account: params.account,
+        userName: params.account,
+        passWord: params.passWord,
+        // email: "admin",
+        // phone: "admin",
+        // mobile: "admin",
+        // age: 19,
+        // sex: 0,
+        // desction: "admin",
+        // depId: "admin",
+        // avatar: "admin",
+        // authId: "admin",
+        // address: "admin",
+        // posi: "admin"
     }).then((reqData) => {
 
-        if (reqData != null) {
-
+        if (reqData != null) { 
             UserInfo.resJSON(res, reqData)
         } else {
 
@@ -120,7 +121,7 @@ router.get("/test", function (req, res) {
     });
 });
 
-export default function(redisClient){
-    redisClient = redisClient;
+export default function(paramsRedisClient){
+    redisClient = paramsRedisClient;
     return router;
 }
